@@ -17,7 +17,8 @@
       "Bash(env -u ANTHROPIC_API_KEY -u PAGEPROC_PROVIDER OPENAI_API_KEY=dummy PAGEPROC_FIRST_MODEL=gpt-4.1-mini PAGEPROC_ESCALATE_MODEL=gpt-4o PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import config; c=config.load\\(\\); print\\('->', c.first_model, c.escalate_model\\)\")",
       "Bash(PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import cli, extract, reconcile, render, providers, segment, image, config; print\\('all modules import clean'\\)\")",
       "Bash(PYTHONPATH=tools tools/family/bin/python *)",
-      "Bash(perl -pi -e 's{pages/page_2\\\\.png}{scans/page_2.png}g' tools/README.md)"
+      "Bash(perl -pi -e 's{pages/page_2\\\\.png}{scans/page_2.png}g' tools/README.md)",
+      "Bash(cd *)"
     ]
   }
 }
