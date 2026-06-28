@@ -1,6 +1,16 @@
+# Python virtual environments
 tools/.venv/
 tools/family/
+
+# pageproc scratch (per-page crops + raw LLM JSON)
 tools/pageproc/.cache/
+
+# Python caches
 __pycache__/
 *.pyc
+*.pyo
+
+# OS cruft
 .DS_Store
+
+# Note: scans/*.png ARE tracked on purpose (the docs embed them).

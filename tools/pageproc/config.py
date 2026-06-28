@@ -65,8 +65,8 @@ class Config:
 
     # --- paths ---
     @property
-    def pages_dir(self) -> Path:
-        return self.root / "pages"
+    def scans_dir(self) -> Path:
+        return self.root / "scans"
 
     @property
     def docs_dir(self) -> Path:

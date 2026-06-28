@@ -1,8 +1,8 @@
 """pageproc CLI.
 
-    python -m pageproc slice   pages/page_2.png [--cols N | --bounds a,b,..]
-    python -m pageproc extract pages/page_2.png [--cols N | --bounds ...]
-    python -m pageproc run     pages/page_2.png        # full pipeline -> docs/page_2.md
+    python -m pageproc slice   scans/page_2.png [--cols N | --bounds a,b,..]
+    python -m pageproc extract scans/page_2.png [--cols N | --bounds ...]
+    python -m pageproc run     scans/page_2.png        # full pipeline -> docs/page_2.md
 
 `slice` is offline (no API key). `extract`/`run` need ANTHROPIC_API_KEY.
 """

@@ -13,8 +13,9 @@ the manual, zero-cost path.)
 
 ## Inputs
 
-A page image path, e.g. `page_2.png` (vertical text, read **right-to-left,
-top-to-bottom**, traditional characters, aged handwriting).
+A page image path under `scans/`, e.g. `scans/page_2.png` (vertical text, read
+**right-to-left, top-to-bottom**, traditional characters, aged handwriting).
+Raw scans live in `scans/`; transcriptions are written to `docs/`.
 
 ## Steps
 
@@ -47,8 +48,38 @@ top-to-bottom**, traditional characters, aged handwriting).
      like 清·乾隆, 干支 years, 落款) only to disambiguate similar cursive forms,
      not to manufacture text.
 
-4. **Write `docs/page_N.md`** in the established format (match `序.md`):
-   - `# 第 N 页`
+4. **Name and write the output file.** Filename is
+   **`docs/NN-<中文名>.md`** where `NN` is the zero-padded page number (from
+   `page_N.png`, so `page_2.png` -> `02-…`) and `<中文名>` is a concise Chinese
+   name for the page's TYPE, which you determine while reading. Common types:
+   `封面`(题词/扉页), `序`(序言), `凡例`, `目录`, `字辈排列`(派语), `世系`(世系图),
+   `家训`, `祠堂`, `墓图`, `跋`. e.g. `docs/02-序.md`, `docs/03-字辈排列.md`.
+
+   - **Duplicate / ambiguous type** (e.g. several 世系 pages would all be
+     `世系`): do NOT silently auto-number. **Stop and ask the user** what
+     distinguishing name to use (e.g. `世系一` vs `世系-梅公支`), then write it.
+   - **Frontmatter** (top of every file, for traceability + clean wikilinks):
+     ```
+     ---
+     title: 序
+     page: 2
+     source: scans/page_2.png
+     type: 序言
+     aliases: [序, 序言]
+     ---
+     ```
+     The `aliases` let `[[序]]` resolve even though the file is `02-序.md` —
+     always cross-link other pages by their plain Chinese name (`[[封面]]`,
+     `[[字辈排列]]`), never by filename.
+   - **Update `docs/目录.md`** — add/refresh the row for this page
+     (页码 ↔ 文件 ↔ 类型 ↔ 扫描件); create the index if missing.
+
+   Body format (match the existing pages):
+   - `# 第 N 页 · <中文名>`
+   - `## 原件扫描` (placed at the TOP, above 性质) — embed the raw scan with a
+     width-controlled relative HTML tag (docs/ -> ../scans/), then a `---`:
+     `<img src="../scans/page_N.png" width="600" alt="第 N 页 原件扫描">`
+     (use the file's actual pixel width if much smaller than 600).
    - `## 性质` — what the page is (序/世系/题词…), reading direction.
    - `## 原文（连读·繁體）` — columns joined into continuous text with `〔〕`/`□`
      markers and editorial punctuation; note "标点为整理时所加".

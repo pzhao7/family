@@ -57,14 +57,14 @@ Run from the repo root (`family/`):
 
 ```sh
 # offline — just preprocess + slice, eyeball the crops in tools/pageproc/.cache/
-python -m pageproc slice pages/page_2.png
+python -m pageproc slice scans/page_2.png
 
 # full pipeline -> docs/page_2.md
-python -m pageproc run pages/page_2.png
+python -m pageproc run scans/page_2.png
 
 # overrides when auto-segmentation is off
-python -m pageproc run pages/page_2.png --cols 10
-python -m pageproc run pages/page_2.png --bounds 0,0.15,0.33,0.51,0.69,0.87,1.0
+python -m pageproc run scans/page_2.png --cols 10
+python -m pageproc run scans/page_2.png --bounds 0,0.15,0.33,0.51,0.69,0.87,1.0
 ```
 
 Env knobs: `PAGEPROC_SAMPLES` (votes/column, default 3), `PAGEPROC_UPSCALE`
