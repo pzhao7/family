@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "Bash(sips -g pixelWidth -g pixelHeight page_2.png)",
+      "Bash(sips -z 2744 4112 page_2.png --out _crop/big.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight _crop/big.png)",
+      "Bash(osascript *)",
+      "Skill(claude-api)",
+      "Bash(tools/.venv/bin/pip install *)",
+      "Bash(tools/.venv/bin/python -c \"import PIL, numpy, anthropic; print\\('deps ok in venv'\\)\")",
+      "Bash(PYTHONPATH=tools tools/.venv/bin/python -m pageproc slice page_2.png)",
+      "Bash(tools/.venv/bin/python -c \"import openai; print\\('openai', openai.__version__\\)\")",
+      "Bash(PYTHONPATH=tools PAGEPROC_PROVIDER=openai OPENAI_API_KEY=dummy tools/.venv/bin/python *)",
+      "Bash(env -u ANTHROPIC_API_KEY -u PAGEPROC_PROVIDER OPENAI_API_KEY=dummy PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import config; print\\('->', config.load\\(\\).provider\\)\")",
+      "Bash(env PAGEPROC_PROVIDER=anthropic ANTHROPIC_API_KEY=dummy PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import config, providers; b=providers.make\\(config.load\\(\\)\\); print\\('->', type\\(b\\).__name__\\)\")",
+      "Bash(env -u ANTHROPIC_API_KEY -u PAGEPROC_PROVIDER OPENAI_API_KEY=dummy PAGEPROC_FIRST_MODEL=gpt-4.1-mini PAGEPROC_ESCALATE_MODEL=gpt-4o PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import config; c=config.load\\(\\); print\\('->', c.first_model, c.escalate_model\\)\")",
+      "Bash(PYTHONPATH=tools tools/.venv/bin/python -c \"from pageproc import cli, extract, reconcile, render, providers, segment, image, config; print\\('all modules import clean'\\)\")",
+      "Bash(PYTHONPATH=tools tools/family/bin/python *)"
+    ]
+  }
+}

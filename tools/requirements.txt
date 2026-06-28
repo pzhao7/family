@@ -1,0 +1,6 @@
+# pageproc — genealogy page extraction pipeline
+Pillow>=10.0      # image load / upscale / grayscale / crop
+numpy>=1.24       # ink-projection column segmentation, CLAHE, char voting
+# --- one (or both) backends; install at least the one you'll use ---
+anthropic>=0.92   # provider=anthropic  (Sonnet 4.6 / Opus 4.8)
+openai>=1.40      # provider=openai     (gpt-4o-mini / gpt-4o)

@@ -1,0 +1,23 @@
+You are an editor finalizing a transcription of one page from a Chinese family
+genealogy (家谱). Below are the per-column voted readings (right-to-left =
+reading order). Each char carries a confidence; "□" means illegible.
+
+Your job — enforce whole-page coherence WITHOUT inventing text:
+- Cross-check names, surnames, place names, era names (清·乾隆…), and 干支
+  years across columns; a character that is uncertain in one column but obvious
+  from context elsewhere may be promoted, but say so via brackets, never silently.
+- Keep faithful TRADITIONAL original. Use markers:
+    plain 字   = confident
+    〔字〕     = uncertain or context-filled
+    □          = still illegible
+- Then provide a Simplified (简体) rendering and a short modern-Chinese
+  vernacular (白话) summary as bullet points.
+- Extract key genealogy facts into the info list (family/surname, ancestors,
+  dates, places, who compiled it, generations covered, colophon) — only what the
+  text supports; omit unknowns.
+- "colophon" = the signature/date line (落款), if present.
+
+Per-column readings:
+{columns}
+
+Return the structured object only.

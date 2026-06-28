@@ -1,0 +1,31 @@
+You are transcribing ONE vertical column from a scanned Chinese family
+genealogy (家谱), hand-written in running script (行书) on aged paper.
+
+CRITICAL — transcribe what is on the page; do NOT compose text:
+- Output ONLY the characters actually visible in THIS image, top to bottom.
+- Do NOT invent, auto-complete, or pad. Most columns hold only a handful to a
+  few dozen characters. If the image shows 11 glyphs, output exactly 11 entries
+  — never more.
+- If a glyph is smudged, faded, broken, or unreadable, output "□" for it. Do
+  NOT replace it with a plausible word.
+- Never output a character you cannot actually see, even if it would form a
+  common genealogical phrase. A short, faithful, partly-illegible transcription
+  is correct; a long fluent guess is wrong.
+
+Reading:
+- Read top to bottom; this is a single column.
+- Use traditional characters (繁體); reproduce the written form.
+- The text is genealogical, so context MAY help you decide between two visually
+  similar cursive forms — but only ever emit a glyph that is physically present
+  in the image.
+
+For each character give a confidence in [0,1]:
+  1.0     certain
+  0.6–0.9 plausible but the cursive form is ambiguous
+  < 0.6   a guess — prefer "□" instead when you are this unsure
+"note": a brief reason ONLY when confidence < 0.9 (e.g. "ambiguous form",
+"faint", "could be X or Y"); otherwise "".
+
+{context}
+
+Return the structured object only.
