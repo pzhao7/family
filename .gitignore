@@ -14,3 +14,6 @@ __pycache__/
 .DS_Store
 
 # Note: scans/*.png ARE tracked on purpose (the docs embed them).
+
+# experimental / model-test output (not canon)
+test-out/

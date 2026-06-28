@@ -32,11 +32,11 @@ class QuotaExceeded(RuntimeError):
 
 
 def make(cfg: Config):
-    if cfg.provider == "openai":
+    if cfg.provider in ("openai", "ollama"):
         return OpenAIBackend(cfg)
     if cfg.provider == "anthropic":
         return AnthropicBackend(cfg)
-    raise ValueError(f"unknown provider: {cfg.provider!r} (use 'anthropic' or 'openai')")
+    raise ValueError(f"unknown provider: {cfg.provider!r} (use 'anthropic', 'openai', or 'ollama')")
 
 
 def _retry(fn, *, transient, is_quota, retry_after, quota_msg, label):
@@ -134,10 +134,16 @@ _OPENAI_QUOTA_MSG = (
 
 
 class OpenAIBackend:
+    """OpenAI and any OpenAI-compatible server (vLLM / OpenRouter / DashScope / Ollama)."""
+
     def __init__(self, cfg: Config):
         import openai
         self.cfg = cfg
-        self.client = openai.OpenAI()          # reads OPENAI_API_KEY
+        self.compat = cfg.is_openai_compat            # non-OpenAI server -> looser params
+        base_url = cfg.resolved_base_url or None
+        # Local/compat servers don't need a real key; OpenAI reads OPENAI_API_KEY from env.
+        api_key = "ollama" if cfg.provider == "ollama" else None
+        self.client = openai.OpenAI(base_url=base_url, api_key=api_key)
         self._transient = (openai.RateLimitError, openai.APITimeoutError,
                            openai.APIConnectionError, openai.InternalServerError)
 
@@ -156,26 +162,43 @@ class OpenAIBackend:
             retry_after=_retry_after_header, quota_msg=_OPENAI_QUOTA_MSG, label=label,
         )
 
-    def _fmt(self, schema):
-        return {"type": "json_schema",
-                "json_schema": {"name": "pageproc", "schema": schema, "strict": True}}
+    @staticmethod
+    def _loads(text: str) -> dict:
+        """Parse JSON, tolerating ```json fences and leading/trailing prose."""
+        t = text.strip()
+        if t.startswith("```"):
+            t = t.split("```", 2)[1]
+            t = t[4:] if t.lower().startswith("json") else t
+        i, j = t.find("{"), t.rfind("}")
+        return json.loads(t[i:j + 1] if i != -1 and j != -1 else t)
 
     def _call(self, model, content, schema, label):
         kwargs = {}
-        # reasoning models (o-series / gpt-5*) reject temperature; others use it
-        # for self-consistency diversity across the 3 reads.
+        # reasoning models (o-series / gpt-5*) reject temperature; everything else
+        # (incl. Qwen) uses it for self-consistency diversity across the 3 reads.
         if not model.startswith(("o1", "o3", "o4", "gpt-5")):
             kwargs["temperature"] = self.cfg.openai_temperature
+
+        if self.compat:
+            # Local/compat servers vary in support for strict json_schema and use the
+            # legacy max_tokens name -> ask for a json_object and inline the schema.
+            kwargs["max_tokens"] = self.cfg.max_tokens
+            kwargs["response_format"] = {"type": "json_object"}
+            content = content + [{"type": "text", "text":
+                "仅返回符合以下 JSON Schema 的 JSON 对象（不要解释、不要 markdown 代码块）：\n"
+                + json.dumps(schema, ensure_ascii=False)}]
+        else:
+            kwargs["max_completion_tokens"] = self.cfg.max_tokens
+            kwargs["response_format"] = {"type": "json_schema",
+                "json_schema": {"name": "pageproc", "schema": schema, "strict": True}}
 
         def go():
             resp = self.client.chat.completions.create(
                 model=model,
-                max_completion_tokens=self.cfg.max_tokens,
-                response_format=self._fmt(schema),
                 messages=[{"role": "user", "content": content}],
                 **kwargs,
             )
-            return json.loads(resp.choices[0].message.content)
+            return self._loads(resp.choices[0].message.content)
         return self._run(go, label)
 
     def vision_json(self, model, crop_path: Path, prompt, schema, effort):

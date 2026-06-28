@@ -46,10 +46,31 @@ export PAGEPROC_PROVIDER=anthropic
 |----------|--------------------|----------------------|
 | `anthropic` | `claude-sonnet-4-6` | `claude-opus-4-8` |
 | `openai`    | `gpt-4o-mini`       | `gpt-4o`             |
+| `ollama`    | `qwen2.5vl:3b` (local) | same (no 2nd tier locally) |
 
 Override models with `PAGEPROC_FIRST_MODEL` / `PAGEPROC_ESCALATE_MODEL` (e.g.
-`gpt-4.1`, `o4-mini`). Both backends go through the same provider-agnostic
-pipeline — switching is a config change, not a code change.
+`gpt-4.1`, `o4-mini`), or `PAGEPROC_MODEL` to set every tier at once. All
+backends share one provider-agnostic pipeline — switching is a config change.
+
+### Local Qwen via Ollama (free, no API, runs on Apple Silicon)
+
+Runs Qwen2.5-VL on your Mac and serves it through an OpenAI-compatible API, so
+the same `openai` code path drives it — just a different endpoint.
+
+```sh
+brew install ollama          # or download the app from ollama.com
+ollama serve                 # start the local server (keep running)
+ollama pull qwen2.5vl:3b     # ~3 GB; use :7b (~6 GB) for better 行书
+
+# point pageproc at it
+PAGEPROC_PROVIDER=ollama PYTHONPATH=tools python -m pageproc run scans/page_3.png
+```
+
+Notes:
+- 3B is for proving the pipeline end-to-end; expect rough results on cursive
+  行书 — bump to `qwen2.5vl:7b` (set `PAGEPROC_MODEL=qwen2.5vl:7b`) for quality.
+- Any other OpenAI-compatible endpoint (vLLM, OpenRouter, DashScope) works the
+  same way: `PAGEPROC_PROVIDER=openai OPENAI_BASE_URL=… OPENAI_API_KEY=… PAGEPROC_MODEL=…`.
 
 ## Usage
 

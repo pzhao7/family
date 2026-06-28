@@ -87,6 +87,8 @@ def cmd_extract(args):
 
 def cmd_run(args):
     cfg = config.load()
+    if args.out:
+        cfg.out = args.out
     src = Path(args.image)
     columns = cmd_extract(args)
     backend = providers.make(cfg)
@@ -111,6 +113,7 @@ def main(argv=None):
         sp.add_argument("image")
         sp.add_argument("--cols", type=int, help="even split into N columns")
         sp.add_argument("--bounds", help="explicit fractional cut lines, e.g. 0,0.2,0.45,1.0")
+        sp.add_argument("--out", help="output dir for the .md (default: docs; use e.g. test-out for experiments)")
         sp.set_defaults(func=fn)
     args = p.parse_args(argv)
     try:
