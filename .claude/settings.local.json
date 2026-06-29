@@ -22,7 +22,10 @@
       "Skill(web_research)",
       "Bash(git add *)",
       "Bash(git commit -q -m 'Add ollama / OpenAI-compatible backend + --out test dir *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(mkdir -p \"docs/1982-抄本\" \"docs/1765-洞庭刻本\")",
+      "Bash(git mv *)",
+      "Bash(perl -pi -e 's{\\\\.\\\\./scans/}{../../scans/}g' \"docs/1982-抄本/\"*.md)"
     ]
   }
 }

@@ -17,6 +17,19 @@ A page image path under `scans/`, e.g. `scans/page_2.png` (vertical text, read
 **right-to-left, top-to-bottom**, traditional characters, aged handwriting).
 Raw scans live in `scans/`; transcriptions are written to `docs/`.
 
+**Two source registers, two confidence baselines.** Scans may be either
+**手写抄本** (aged 行书 — the hard case the preprocessing is tuned for) or a
+**雕版刻本/印本** (woodblock *print* — clean regular script, slices come out
+razor-sharp and confidence is high). Note which in the frontmatter (`edition:`)
+and the 转录说明; for a 刻本, the heavy CLAHE/Sauvola/deskew is overkill but
+harmless — keep it, just expect (and state) high confidence.
+
+**Multiple editions of the same lineage** live in **per-edition subfolders**
+under `docs/` (e.g. `docs/1982-抄本/`, `docs/1765-洞庭刻本/`), each with its own
+`目录.md`, plus a **master `docs/目录.md`** that links both and records how they
+互证 (shared 始祖, the generation where they connect). Scan refs from a
+subfolder use `../../scans/`.
+
 ## Steps
 
 1. **Slice the page locally (mechanical, offline).** Prefer the project tool;
@@ -54,6 +67,14 @@ Raw scans live in `scans/`; transcriptions are written to `docs/`.
    name for the page's TYPE, which you determine while reading. Common types:
    `封面`(题词/扉页), `序`(序言), `凡例`, `目录`, `字辈排列`(派语), `世系`(世系图),
    `家训`, `祠堂`, `墓图`, `跋`. e.g. `docs/02-序.md`, `docs/03-字辈排列.md`.
+
+   - **卷-organized editions (printed 宗譜).** When the book's meaningful unit is
+     the **卷 (juan)** rather than a leaf page number — pages are sparse/large
+     (670, 1430…) and several map to one 卷 — name by 卷 instead:
+     `卷<卷次>-<中文名>.md` (e.g. `卷首-序-沈德潛.md`, `卷五-世系-六至十世.md`),
+     written into that edition's subfolder. Put the leaf page in `page:` and the
+     scan in `source:`. Add an `edition:` frontmatter field and, for 世系, a
+     `branch:` field (the 支系, e.g. `保二公下孟昇公支`).
 
    - **Duplicate / ambiguous type** (e.g. several 世系 pages would all be
      `世系`): do NOT silently auto-number. **Stop and ask the user** what
@@ -125,6 +146,43 @@ Raw scans live in `scans/`; transcriptions are written to `docs/`.
      char does NOT match the expected 字辈, do not force it — transcribe what you
      see and flag the mismatch in the note. (Generations 1–15 predate the 字辈 and
      use 行第 / 单名 / 官称, e.g. 一世「承事公」、二世「三十四公」, so no anchor there.)
+
+   ### Page-type variant — 世系圖 (lineage chart / 吊線圖)
+
+   A printed 宗譜 volume page headed `…宗譜卷N` + a 支系 line (`X公下Y公支`) whose
+   body is a **2-D hanging-line chart**, NOT a linear list. Do not read it as the
+   `世系录` variant — column-by-column there destroys the tree. Its geometry:
+   - **Each vertical column = one father→son descent line**, read **top→bottom =
+     ancestor→descendant** (top of the column is the elder generation).
+   - **A separate 「世」band-ruler column** (`六世 / 七世 / 八世 …` stacked
+     top-to-bottom) fixes which vertical position belongs to which generation —
+     **find it first** and use it to assign 世 to every name.
+   - **双行小字 annotations carry the structure**: `X長子`/`X次子` → the person's
+     **父** (parent); `子N` → number of sons; plus `葬…`/`字…`/`早世` notes.
+   - The header often cross-refs earlier generations (`〔始祖以來前見一卷〕` =
+     1–N世 are in a previous 卷). Note the compiler colophon (`十五世孫…重輯`).
+
+   Handle it as:
+   - **Name** `卷N-世系-<起>至<止>世.md`; frontmatter `type: 世系图`,
+     `branch: <支系>`, `generations: <起>-<止>`, `edition:`.
+   - **Replace the linear table with a 世/名/父/小注 table** — one row per person,
+     世 from the ruler column, 父 from the `X長子/次子` note, the rest in 小注:
+     ```
+     | 世 | 名 | 父 | 小注 |
+     |----|----|----|------|
+     | 六世 | 孟昇 | 保二 | 保二公之子；葬折澗橋山；子一 |
+     | 七世 | 仁   | 孟昇 | 孟昇長子；子一 |
+     ```
+   - **Reading strategy**: trace the main trunk (eldest-son chain) top→bottom
+     first — it's the clearest; then pick up sibling branches (`次子`/`三子`) and
+     lower generations, which are usually fainter. Keep `逐列原文` (faithful
+     per-column dump, labeled by descent line / ruler), `简体`, `白话`, `信息一览`.
+   - **字辈 cross-check** still applies for generations ≥16 (see above); pre-16
+     charts use 行第/單名 so no anchor — but cross-link the same ancestor in the
+     other edition when present (e.g. 六世孟昇公 also in `[[世系-一至十八世]]`).
+   - **Faint lower branches**: re-crop that sub-region tighter/larger and re-read
+     rather than guessing; mark `〔〕`/`□` and say so. A partly-`□` lower tree is
+     correct; a fluent invented one is wrong.
 
 5. **Report** a short summary: surname/family, key facts, and which columns/chars
    were uncertain. Surface anything surprising (e.g. surname differs from what
